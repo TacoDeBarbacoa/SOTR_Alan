@@ -1,0 +1,219 @@
+# incluir  < WiFi.h >
+# incluir  < HTTPClient.h >
+# incluir  < tiempo.h >  
+
+Const  char WIFI_SSTD[] = “ PocoX3PRO“ ;
+Const  char WIFI_PASSWORD[] = “Alan1234“ ;
+
+Const  char * ntpServer = “ pool.ntp.org “ ;
+Const  long gmtOffset_sec = 0 ;
+Const  int luz del díaOffset_sec = 3600 ;
+
+ // ultrasónico
+# definir  SOUND_SPEED  0.034
+# definir  CM_TO_INCH  0.393701 
+Const  int trigPin = 14 ;
+Const  int echoPin = 2 ;
+
+Larga duración;
+Distancia flotante en;
+Distancia flotante pulgadas;
+
+Cadena fecha = “ 0 “ ;
+Void  Obtener Fecha ( void );
+Vacío  Ultrasonix ( vacío );
+// variable de control
+
+Control int = 0 ;
+Void  Obtener Fecha ( void );
+Vacío  Ultrasonix ( vacío );
+Vacío  FireBase ( vacío );
+/////////////////////////// _
+# si está definido (ESP32)
+# incluir  < WiFi.h >
+# elif definido(ESP8266)
+# incluir  < ESP8266WiFi.h >
+# endif
+# incluir  < Firebase_ESP_Client.h >
+
+// Proporcione la información del proceso de generación del token.
+# incluir  < complementos/TokenHelper.h >
+
+// Proporcione la información de impresión de la carga útil de RTDB y otras funciones auxiliares.
+# incluir  < complementos/RTDBHelper.h >
+
+/* 1. Definir las credenciales WiFi */
+
+// Para las siguientes credenciales, consulte ejemplos/Autenticaciones/SignInAsUser/EmailPassword/EmailPassword.ino
+
+/* 2. Definir la clave API */
+# definir  API_KEY  “ AIzaSyAyjgW6_7gdOEXMkMOlhBw4pddgyHv5gfg “
+
+/* 3. Definir la URL de RTDB */
+# define  DATABASE_URL  “ https://esp32hupiiz-default-rtdb.firebaseio.com/ “  // <nombre de la base de datos>.firebaseio.com o <nombre de la base de datos>.<región>.firebasedatabase.app
+
+/* 4. Defina el usuario Email y contraseña que ya registró o agregó en su proyecto */
+# definir  USER_EMAIL  “ USER_EMAIL “
+# definir  CONTRASEÑA_USUARIO  “ CONTRASEÑA_USUARIO “
+
+// Definir objeto de datos de Firebase
+FirebaseData fbdo;
+
+Autenticación de FirebaseAuth;
+Configuración de FirebaseConfig;
+
+ Largo sin firmar sendDataPrevMillis = 0 ;
+
+ Cuenta larga sin signo = 0 ;
+ Configuración vacía () {
+  De serie. Comenzar ( 9600 );
+  Wifi. Comenzar (WIFI_SSTD, WIFI_PASSWORD);
+  De serie. Println ( “ Conectando “ );
+  Mientras (WiFi. Estado ()! = WL_CONECTADO) {
+    Retraso ( 250 );
+    De serie. Imprimir ( “ . “ );
+  }
+
+  Mando = 1 ;
+  De serie. Println ( “ Conexión exitosa “ );
+  De serie. Print ( “ Conectando con la siguiente dirección IP: “ );
+  De serie. Println (WiFi. localIP ());
+  pinMode (pin de disparo, SALIDA);
+  pinMode (echoPin, ENTRADA);
+  escritura digital (pin disparador, BAJO);
+
+   De serie. Comenzar ( 9600 );
+
+    Wifi. Comenzar (WIFI_SSTD, WIFI_PASSWORD);
+    De serie. Imprimir ( “ Conectando a Wi-Fi “ );
+    While (WiFi. Estado () ¡= WL_CONNECTED)
+    {
+        De serie. Imprimir ( “ . “ );
+        Retraso ( 300 );
+    }
+    De serie. Imprimirln ();
+    De serie. Print ( “ Conectado con IP: “ );
+    De serie. Println (WiFi. localIP ());
+    De serie. Imprimirln ();
+
+    De serie. Printf ( “ Firebase Client v%s \n\n “ , FIREBASE_CLIENT_VERSION);
+
+    /* Asignar la clave api (obligatorio) */
+    Configuración clave_api = CLAVE_API;
+
+    /* Asignar las credenciales de inicio de sesión del usuario */
+    Aut. Usuario _ correo electrónico = USUARIO_EMAIL;
+    Aut. Usuario _ contraseña = USUARIO_CONTRASEÑA;
+
+    /* Asignar la URL de RTDB (obligatorio) */
+    Configuración URL_base_datos = URL_BASE_DATOS;
+
+    /* Asignar la función de devolución de llamada para la tarea de generación de tokens de ejecución prolongada */
+    Configuración token_status_callback = tokenStatusCallback; // ver complementos/TokenHelper.h
+
+    // O use el método de autenticación heredado
+    // config.database_url = DATABASE_URL;
+    // config.signer.tokens.legacy_token = “<secreto de la base de datos>”;
+
+    Base de fuego. Comenzar (&config, &auth);
+
+    // Comente o pase un valor falso cuando la reconexión WiFi controlará su código o la biblioteca de terceros
+    Base de fuego. reconectarWiFi ( verdadero );
+}
+
+
+ Bucle vacío () {
+  Mientras ( 1 ){
+    ObtenerFecha ();
+    Ultrasonix ();
+    Base de fuego ();
+    Retraso ( 5000 );
+  }
+
+}
+
+Void  GetDate ( void ){
+  Estructura  tm timeinfo;
+  // Int y obtener la fecha
+  configTime (gmtOffset_sec, luz del díaOffset_sec, ntpServer);
+  if (¡ getLocalTime (&timeinfo)){
+    De serie. Println ( “ Error al obtener la hora “ );
+    Volver ;
+  }
+  
+  Char timeYear[ 5 ];
+  Strftime (timeYear, 5 , “ %Y “ , &timeinfo);
+  Char tiempoMes[ 15 ];
+  Strftime (timeMonth, 15 , “ %B “ , &timeinfo);
+  Char tiempoDia[ 10 ];
+  Strftime (timeDay, 10 , “ %d “ , &timeinfo);
+  Char tiempoHora[ 3 ];
+  Strftime (timeHour, 3 , “ %H “ , &timeinfo);
+  Char timeMin[ 3 ];
+  Strftime (timeMin, 3 , “ %M “ , &timeinfo);
+  Fecha = String (timeYear)+ String (timeMonth)+ String (timeDay)+ String ( “   “ )+ String (timeHour)+ String ( “ : “ )+ String (timeMin);
+  De serie. Println (fecha);
+}
+
+Vacío  Ultrasonix ( vacío ){
+  // limpiar el gatillo
+  Escritura digital (pin de disparo, BAJO);
+  retrasoMicrosegundos ( 2 );
+  // poner el gatillo en alto 10 microsegundos
+  Escritura digital (pin disparador, ALTO);
+  retrasoMicrosegundos ( 10 );
+  escritura digital (pin de disparo, BAJO);
+  // leer el pin echo
+  Duración = pulseIn (echoPin, HIGH);
+
+  // calcular las distancias
+  Distancia en = duración * SOUND_SPEED/ 2 ;
+
+  // Imprimimos la distancia
+  De serie. Imprimir ( “ Distancia (cm): “ );
+  De serie. Println (distanciaEn);
+}
+Vacío  FireBase ( vacío ){
+  // Flash string (PROGMEM y (FPSTR), String C/C++ string, const char, char array, string literal son compatibles
+    // en todas las funciones de Firebase y FirebaseJson, a menos que no se admita la macro F().
+
+    If (Firebase. Ready () && ( milis () – sendDataPrevMillis > 15000 || sendDataPrevMillis == 0 ))
+    {
+        sendDataPrevMillis = milis ( );
+
+        FirebaseJson dist;
+        Dist. establecerDoblesDígitos ( 4 );
+        Dist. Agregar ( “ valor “ , distanciaEn);
+
+        De serie. Printf ( “ Establecer dist… %s \n “ , Firebase. RTDB . setJSON (&fbdo, “ /test/distancia “ , &dist) ¿ “ ok “ : fbdo. errorReason (). C_str ());
+
+        Fecha de FirebaseJson;
+        Fecha. establecerDígitosDobles ( 12 );
+        Fecha. Agregar ( “ valor “ , fecha);
+
+        FirebaseJson json;
+        Json establecerDígitosDobles ( 3 );
+        Json sumar ( “ valor “ , contar);
+        
+        De serie. Printf ( “ Obtener json… %s \n “ , Firebase. RTDB . getJSON (&fbdo, “ /test/json “ ) ¿ fbdo. To <FirebaseJson>(). Raw () : fbdo. errorReason (). C_str ());
+
+        FirebaseJson jVal;
+        De serie. Printf ( “ Obtener json ref… %s \n “ , Firebase. RTDB . getJSON (&fbdo, “ /test/json “ , &jVal) ¿ jVal. Raw () : fbdo. errorReason (). C_str ());
+
+        FirebaseJsonArrayarr;
+        Arreglo establecerDígitosFlotantes ( 2 );
+        Arreglo establecerDoblesDígitos ( 4 );
+        Arreglo agregar ( “ a “ , “ b “ , “ c “ , verdadero , 45 , ( flotante ) 6.1432 , 123.45692789 );
+
+        De serie. Printf ( “ Establecer matriz… %s \n “ , Firebase. RTDB . setArray (&fbdo, “ /test/array “ , &arr) ¿ “ ok “ : fbdo. errorReason (). C_str ());
+
+        De serie. Printf ( “ Obtener matriz… %s \n “ , Firebase. RTDB . getArray (&fbdo, “ /test/array “ ) ¿ fbdo. To <FirebaseJsonArray>(). Raw () : fbdo. errorReason (). C_str ());
+
+        // Serial.printf(“Push json… %s\n”, Firebase.RTDB.pushJSON(&fbdo, “/test/push”, &json) ¿ “ok” : fbdo.errorReason().c_str()) ;
+
+        Json establecer ( “ valor “ , cuenta + 0.29745 );
+        De serie. Printf ( “ Actualizar json… %s \n\n “ , Firebase. RTDB . updateNode (&fbdo, “ /test/push/ “ + fbdo. pushName (), &json) ¿ “ ok “ : fbdo. errorReason () .c_str ( ) );
+
+        Contar++;
+    }
+  }
