@@ -47,7 +47,7 @@ Vacío  FireBase ( vacío );
 // Para las siguientes credenciales, consulte ejemplos/Autenticaciones/SignInAsUser/EmailPassword/EmailPassword.ino
 
 /* 2. Definir la clave API */
-# definir  API_KEY  “ AIzaSyAyjgW6_7gdOEXMkMOlhBw4pddgyHv5gfg “
+# definir  API_KEY  “Ingresa aquí el API KEY“
 
 /* 3. Definir la URL de RTDB */
 # define  DATABASE_URL  “ https://esp32hupiiz-default-rtdb.firebaseio.com/ “  // <nombre de la base de datos>.firebaseio.com o <nombre de la base de datos>.<región>.firebasedatabase.app
@@ -217,3 +217,4 @@ Vacío  FireBase ( vacío ){
         Contar++;
     }
   }
+ 
