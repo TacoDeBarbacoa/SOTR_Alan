@@ -1,0 +1,66 @@
+/* PRIORIDADES DE TAREAS 
+En esta actividad se Modifico la prioridad de las tareas, primero estableciendo la prioridad igual, después se modificó 
+la prioridad se inviertio esta prioridad con la finalidad de observar el comportamiento a través de un osciloscopio.*/
+
+#if CONFIG_FREERTOS_UNICORE
+static const BaseType_t app_cpu = 0;
+#else
+static const BaseType_t app_cpu = 1;
+#endif
+
+static const int rate_1 = 500;  // ms
+static const int rate_2 = 323;  // ms
+
+static const int led = 5;
+
+void toggleLED_1(void *parameter) {
+  while(1) {
+    digitalWrite(led, HIGH);
+    vTaskDelay(rate_1 / portTICK_PERIOD_MS);
+    digitalWrite(led, LOW);
+    vTaskDelay(rate_1 / portTICK_PERIOD_MS);
+  }
+}
+
+void toggleLED_2(void *parameter) {
+  while(1) {
+    digitalWrite(led, HIGH);
+    vTaskDelay(rate_2 / portTICK_PERIOD_MS);
+    digitalWrite(led, LOW);
+    vTaskDelay(rate_2 / portTICK_PERIOD_MS);
+  }
+}
+
+ 
+
+void setup() {
+
+  pinMode(led, OUTPUT);  
+
+  xTaskCreatePinnedToCore(  
+              toggleLED1,  
+              "Toggle 1",   
+              1024,         
+              NULL,         
+              1,            
+              NULL,         
+              app_cpu);     
+
+
+ 
+  xTaskCreatePinnedToCore(  
+              toggleLED2,  
+              "Toggle 2",   
+              1024,         
+              NULL,         
+              1,            
+              NULL,         
+              app_cpu);     
+
+
+}
+
+
+void loop() {
+
+}
