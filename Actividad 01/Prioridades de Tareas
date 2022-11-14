@@ -62,3 +62,6 @@ void setup() {
 void loop() {
 
 }
+//Al probar el codigo modificando las prioridades se obtuvo lo siguiente;
+//Si se pone la misma prioridad a las 2 tareas estas se ejecutan al mismo tiempo
+//Si le ponemos diferentes prioridades por un tiempo parpadearan cada una a su tiempo sin embargo le dara preferencia a la de mayor prioridad
