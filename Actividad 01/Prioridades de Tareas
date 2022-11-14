@@ -2,15 +2,17 @@
 En esta actividad se Modifico la prioridad de las tareas, primero estableciendo la prioridad igual, después se modificó 
 la prioridad se inviertio esta prioridad con la finalidad de observar el comportamiento a través de un osciloscopio.*/
 
+// Configuracion
 #if CONFIG_FREERTOS_UNICORE
 static const BaseType_t app_cpu = 0;
 #else
 static const BaseType_t app_cpu = 1;
 #endif
 
-static const int rate_1 = 500;  // ms
-static const int rate_2 = 323;  // ms
+static const int rate_1 = 500;  // microssegundos
+static const int rate_2 = 250;  // microsegundos
 
+// Numero de GPIO
 static const int led = 5;
 
 void toggleLED_1(void *parameter) {
@@ -35,14 +37,14 @@ void toggleLED_2(void *parameter) {
 
 void setup() {
 
-  pinMode(led, OUTPUT);  
+  pinMode(led, OUTPUT);  // Configuracion GPIO como salida
 
   xTaskCreatePinnedToCore(  
-              toggleLED1,  
-              "Toggle 1",   
-              1024,         
+              toggleLED1,  //Funcion que será llamada
+              "Toggle 1",   // Nombre de la Tarea
+              1024, //(Bytes en ESP32        
               NULL,         
-              1,            
+              1,   //Prioridad de Tarea         
               NULL,         
               app_cpu);     
 
